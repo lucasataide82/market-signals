@@ -1,33 +1,26 @@
 import os
 import yfinance as yf
 import matplotlib.pyplot as plt
-import tweepy
 from datetime import datetime
 import pandas as pd
+import tweepy
+import base64
 
 # -------------------
-# API KEYS
+# API KEYS / SECRETS
 # -------------------
 API_KEY = os.environ["X_API_KEY"]
 API_SECRET = os.environ["X_API_SECRET"]
 ACCESS_TOKEN = os.environ["X_ACCESS_TOKEN"]
 ACCESS_SECRET = os.environ["X_ACCESS_SECRET"]
 
+# Tweepy v2 Client
 client = tweepy.Client(
     consumer_key=API_KEY,
     consumer_secret=API_SECRET,
     access_token=ACCESS_TOKEN,
     access_token_secret=ACCESS_SECRET
 )
-
-auth = tweepy.OAuth1UserHandler(
-    API_KEY,
-    API_SECRET,
-    ACCESS_TOKEN,
-    ACCESS_SECRET
-)
-
-api = tweepy.API(auth)
 
 # -------------------
 # STOCKS
@@ -128,12 +121,19 @@ Charts below ↓
 """
 
 # -------------------
-# Post tweet with media
+# Post tweet with image (Tweepy v2)
 # -------------------
-media = api.media_upload(filename)
+with open(filename, "rb") as f:
+    media_bytes = f.read()
+    media_b64 = base64.b64encode(media_bytes).decode("utf-8")
+
+# Upload media and get media_id
+media_response = client.create_media(media=media_b64)
+
+# Post tweet with media
 client.create_tweet(
     text=tweet_text,
-    media_ids=[media.media_id]
+    media_ids=[media_response.media_id]
 )
 
 print("Tweet posted successfully!")
