@@ -1,0 +1,7 @@
+yfinance
+pandas
+matplotlib
+tweepy
+sqlalchemy
+psycopg2-binary
+schedule
